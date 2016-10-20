@@ -17,9 +17,10 @@ import model.Usuario;
 public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador {
 
     private final LinkedList<Usuario> usuarios;
-
+    private final String caminho;
     public GerenciadorImple() throws RemoteException {
         super();
+        caminho =  "Documentos" + File.separator;
         this.usuarios = new LinkedList<>();
         usuarios.add(new Usuario("icaro", "rios"));
         usuarios.add(new Usuario("thiago", "beiga"));
@@ -89,7 +90,7 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
              PrintWriter writer = new PrintWriter(nome+".txt", "UTF-8");            
              writer.close();
              */
-            File f = new File(nome+".txt");
+            File f = new File(caminho+nome + ".txt");
             if (!f.exists() && !f.isDirectory()) {
                 f.createNewFile();
                 return true;
@@ -104,7 +105,21 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
 
     @Override
     public String listarDocumentos() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String informacao = "";
+        try {
+            File folder = new File(caminho);
+
+            File[] listOfFiles = folder.listFiles();
+
+            for (File listOfFile : listOfFiles) {
+                if (listOfFile.isFile()) {
+                    informacao += listOfFile.getName() + ";";
+                }
+            }
+        } catch (Exception ex) {
+            return "";
+        }
+        return informacao;
     }
 
 }

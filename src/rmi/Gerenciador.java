@@ -9,11 +9,8 @@ public interface Gerenciador extends Remote {
 
     public boolean deslogar(String nome, String senha) throws RemoteException;
 
+    public String listarDocumentos() throws RemoteException;
+
     public boolean criarDocumento(String nome) throws RemoteException;
-    
-    public String listarDocumentos()throws RemoteException;
-    
-       
-    
 
 }

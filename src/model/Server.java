@@ -16,6 +16,7 @@ public class Server {
     }
     
     public void iniciar(String ip) throws RemoteException, MalformedURLException{
+        System.setProperty("java.rmi.server.hostname", ip);
         Registry r = LocateRegistry.createRegistry(3322);
         Naming.rebind("//"+ ip + ":3322/gerenciador", gerenciador);
         

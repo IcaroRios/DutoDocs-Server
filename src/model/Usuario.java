@@ -35,7 +35,7 @@ public class Usuario implements Serializable {
         if (o instanceof Usuario) {
             Usuario aux = (Usuario) o;
 
-            return (aux.getNome().equals(this.nome));
+            return aux.getNome().equals(this.nome)&& aux.getSenha().equalsIgnoreCase(this.senha);
         } else {
             return false;
         }
