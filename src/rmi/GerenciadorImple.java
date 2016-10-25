@@ -1,7 +1,11 @@
 package rmi;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
@@ -18,9 +22,10 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
 
     private final LinkedList<Usuario> usuarios;
     private final String caminho;
+
     public GerenciadorImple() throws RemoteException {
         super();
-        caminho =  "Documentos" + File.separator;
+        caminho = "Documentos" + File.separator;
         this.usuarios = new LinkedList<>();
         usuarios.add(new Usuario("icaro", "rios"));
         usuarios.add(new Usuario("thiago", "beiga"));
@@ -58,18 +63,16 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
     }
 
     @Override
-    public boolean deslogar(String nome, String senha) throws RemoteException {
+    public boolean deslogar(String nome) throws RemoteException {
         /**
          * retorna verdadeiro quando o char foi deslogado com sucesso. retorna
          * false quando o usuario já estava offline ou não está cadastrado.
          */
 
         //usuario auxilar para comparação
-        Usuario aux = new Usuario(nome, senha);
-
         //pecorrendo a lista, para verificar se o usuario existe
         for (Usuario u : usuarios) {
-            if (u.equals(aux)) {
+            if (u.getNome().equalsIgnoreCase(nome)) {
                 //caso o usuario exista, verifica se ele já está online.
                 if (u.isIsOnline()) {
                     //deslogando o usuario.
@@ -90,7 +93,7 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
              PrintWriter writer = new PrintWriter(nome+".txt", "UTF-8");            
              writer.close();
              */
-            File f = new File(caminho+nome + ".txt");
+            File f = new File(caminho + nome + ".txt");
             if (!f.exists() && !f.isDirectory()) {
                 f.createNewFile();
                 return true;
@@ -122,4 +125,29 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
         return informacao;
     }
 
+    @Override
+    public String abrirArquivo(String nome) throws RemoteException {
+        BufferedReader br;
+        String texto = "";
+        try {
+            br = new BufferedReader(new InputStreamReader(
+                    new FileInputStream("Documentos" + File.separator + nome), "UTF-8"));
+           
+           String linha = br.readLine();
+           while(linha!= null){               
+               texto +=linha + '\n';
+               linha = br.readLine();
+           }           
+           br.close();
+           return texto;
+        } catch (UnsupportedEncodingException ex) {
+            Logger.getLogger(GerenciadorImple.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (FileNotFoundException ex) {
+            Logger.getLogger(GerenciadorImple.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(GerenciadorImple.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return texto;
+    }
+    
 }
