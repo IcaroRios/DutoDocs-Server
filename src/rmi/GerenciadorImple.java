@@ -1,9 +1,11 @@
 package rmi;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -132,14 +134,12 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
         try {
             br = new BufferedReader(new InputStreamReader(
                     new FileInputStream("Documentos" + File.separator + nome), "UTF-8"));
-           
-           String linha = br.readLine();
-           while(linha!= null){               
-               texto +=linha + '\n';
-               linha = br.readLine();
-           }           
-           br.close();
-           return texto;
+
+            while (br.ready()) {
+                texto += br.readLine() + '\n';
+            }
+            br.close();
+            return texto;
         } catch (UnsupportedEncodingException ex) {
             Logger.getLogger(GerenciadorImple.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
@@ -149,5 +149,21 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
         }
         return texto;
     }
-    
+
+    @Override
+    public String escreverArquivo(String arquivo, String texto) throws RemoteException {
+        System.out.println("inserindo");       
+
+        try {
+            FileWriter fileW = new FileWriter(new File("Documentos" + File.separator + arquivo));//arquivo para escrita
+            BufferedWriter buffW = new BufferedWriter(fileW);
+            buffW.write(texto);
+            buffW.close();
+            fileW.close();
+        } catch (IOException ex) {
+            System.out.println("erro com o arquivo");
+        }
+        return null;
+    }
+
 }
