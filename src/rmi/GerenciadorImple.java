@@ -173,7 +173,9 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
     @Override
     public String escreverArquivo(String arquivo, String texto, int linha, String login) throws RemoteException {
         Usuario editor = buscarUsuario(login);
-        //if (editor.getLinha() == linha) {
+        Arquivo documento = buscarArquivo(arquivo);
+        Linha editada = buscarLinha(editor, documento);
+        if (editada.getUsuario().equals(editor) && editada.getPosicao() == linha) {
             System.out.println("inserindo");
 
             try {
@@ -186,11 +188,11 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
             } catch (IOException ex) {
                 System.out.println("erro com o arquivo");
             }
-        /*
+
         } else {
             System.out.println("usuario não pode editar a linha");
         }
-                */
+
         return null;
     }
 
@@ -199,11 +201,22 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
         Usuario editor = buscarUsuario(login);
         Arquivo solocitado = buscarArquivo(arquivo);
         Linha resultado = buscarLinha(editor, solocitado);
-        if (resultado == null){
-            resultado = new Linha(editor, solocitado,linha);
+        if (resultado == null) {
+            resultado = new Linha(editor, solocitado, linha);
             linhas.add(resultado);
-        }else{
-            resultado.setPosicao(linha);
+            print("linha nova para este usuario e arquivo");
+        } else {
+            boolean temDono = false;
+            for (Linha atual : linhas) {
+                if (atual.getPosicao() == linha && !atual.getUsuario().equals(editor)) {
+                    temDono = true;
+                    print("posicao já tem um dono");
+                }
+            }
+            if (!temDono) {
+                resultado.setPosicao(linha);
+                print("posicao da linha alterada");
+            }
         }
 
     }
@@ -234,5 +247,9 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
             }
         }
         return null;
+    }
+
+    private void print(String mensagem) {
+        System.out.println(mensagem);
     }
 }
