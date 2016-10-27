@@ -7,6 +7,7 @@ public class Usuario implements Serializable {
     private final String nome;
     private final String senha;
     private boolean isOnline;
+    private int linha;
 
     public Usuario(String nome, String senha) {
         this.nome = nome;
@@ -40,5 +41,15 @@ public class Usuario implements Serializable {
             return false;
         }
     }
+
+    public int getLinha() {
+        return linha;
+    }
+
+    public void setLinha(int linha) {
+        this.linha = linha;
+    }
+    
+    
 
 }

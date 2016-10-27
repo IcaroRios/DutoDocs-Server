@@ -15,5 +15,7 @@ public interface Gerenciador extends Remote {
     
     public String abrirArquivo(String nome) throws  RemoteException;
 
-    public String escreverArquivo(String arquivo,String texto) throws RemoteException;
+    public String escreverArquivo(String arquivo,String texto, int linha, String login) throws RemoteException;
+    
+    public void pedirLinhaArquivo(int linha, String login, String arquivo) throws RemoteException;
 }

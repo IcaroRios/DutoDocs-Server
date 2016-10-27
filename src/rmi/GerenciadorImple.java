@@ -18,17 +18,23 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import model.Arquivo;
+import model.Linha;
 import model.Usuario;
 
 public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador {
 
     private final LinkedList<Usuario> usuarios;
     private final String caminho;
+    private LinkedList<Arquivo> arquivos;
+    private LinkedList<Linha> linhas;
 
     public GerenciadorImple() throws RemoteException {
         super();
         caminho = "Documentos" + File.separator;
         this.usuarios = new LinkedList<>();
+        this.arquivos = new LinkedList<>();
+        this.linhas = new LinkedList<>();
         usuarios.add(new Usuario("icaro", "rios"));
         usuarios.add(new Usuario("thiago", "beiga"));
         usuarios.add(new Usuario("minha", "mae"));
@@ -119,11 +125,25 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
             for (File listOfFile : listOfFiles) {
                 if (listOfFile.isFile()) {
                     informacao += listOfFile.getName() + ";";
+
+                    Arquivo novo = new Arquivo(listOfFile.getName());
+                    boolean existente = false;
+                    for (Arquivo atual : arquivos) {
+                        if (atual.equals(novo)) {
+                            existente = true;
+                        }
+                    }
+                    if (!existente) {
+                        arquivos.add(novo);
+                    }
                 }
             }
+
         } catch (Exception ex) {
+
             return "";
         }
+
         return informacao;
     }
 
@@ -136,7 +156,7 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
                     new FileInputStream("Documentos" + File.separator + nome), "UTF-8"));
 
             while (br.ready()) {
-                texto += br.readLine() + '\n';
+                texto += br.readLine() + "\n";
             }
             br.close();
             return texto;
@@ -151,19 +171,68 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
     }
 
     @Override
-    public String escreverArquivo(String arquivo, String texto) throws RemoteException {
-        System.out.println("inserindo");       
+    public String escreverArquivo(String arquivo, String texto, int linha, String login) throws RemoteException {
+        Usuario editor = buscarUsuario(login);
+        //if (editor.getLinha() == linha) {
+            System.out.println("inserindo");
 
-        try {
-            FileWriter fileW = new FileWriter(new File("Documentos" + File.separator + arquivo));//arquivo para escrita
-            BufferedWriter buffW = new BufferedWriter(fileW);
-            buffW.write(texto);
-            buffW.close();
-            fileW.close();
-        } catch (IOException ex) {
-            System.out.println("erro com o arquivo");
+            try {
+                FileWriter fileW = new FileWriter(new File("Documentos" + File.separator + arquivo));//arquivo para escrita
+                BufferedWriter buffW = new BufferedWriter(fileW);
+                buffW.write(texto);
+
+                buffW.close();
+                fileW.close();
+            } catch (IOException ex) {
+                System.out.println("erro com o arquivo");
+            }
+        /*
+        } else {
+            System.out.println("usuario não pode editar a linha");
+        }
+                */
+        return null;
+    }
+
+    @Override
+    public void pedirLinhaArquivo(int linha, String login, String arquivo) throws RemoteException {
+        Usuario editor = buscarUsuario(login);
+        Arquivo solocitado = buscarArquivo(arquivo);
+        Linha resultado = buscarLinha(editor, solocitado);
+        if (resultado == null){
+            resultado = new Linha(editor, solocitado,linha);
+            linhas.add(resultado);
+        }else{
+            resultado.setPosicao(linha);
+        }
+
+    }
+
+    private Usuario buscarUsuario(String login) {
+        for (Usuario atual : usuarios) {
+            if (atual.getNome().equalsIgnoreCase(login)) {
+                return atual;
+            }
         }
         return null;
     }
 
+    private Arquivo buscarArquivo(String arquivo) {
+        for (Arquivo atual : arquivos) {
+            if (atual.getNome().equalsIgnoreCase(arquivo)) {
+                return atual;
+            }
+        }
+        return null;
+    }
+
+    private Linha buscarLinha(Usuario usuario, Arquivo arquivo) {
+        Linha busca = new Linha(usuario, arquivo);
+        for (Linha atual : linhas) {
+            if (atual.equals(busca)) {
+                return atual;
+            }
+        }
+        return null;
+    }
 }
