@@ -20,6 +20,7 @@ public class Server {
         Registry r = LocateRegistry.createRegistry(3322);
         Naming.rebind("//"+ ip + ":3322/gerenciador", gerenciador);
         
+        
     }
     
 }

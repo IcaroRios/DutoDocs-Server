@@ -175,24 +175,25 @@ public class GerenciadorImple extends UnicastRemoteObject implements Gerenciador
         Usuario editor = buscarUsuario(login);
         Arquivo documento = buscarArquivo(arquivo);
         Linha editada = buscarLinha(editor, documento);
-        if (editada.getUsuario().equals(editor) && editada.getPosicao() == linha) {
-            System.out.println("inserindo");
+        //if (editada.getUsuario().equals(editor) && editada.getPosicao() == linha) {
+        System.out.println("inserindo");
 
-            try {
-                FileWriter fileW = new FileWriter(new File("Documentos" + File.separator + arquivo));//arquivo para escrita
-                BufferedWriter buffW = new BufferedWriter(fileW);
-                buffW.write(texto);
+        try {
+            FileWriter fileW = new FileWriter(new File("Documentos" + File.separator + arquivo));//arquivo para escrita
+            BufferedWriter buffW = new BufferedWriter(fileW);
+            buffW.write(texto);
 
-                buffW.close();
-                fileW.close();
-            } catch (IOException ex) {
-                System.out.println("erro com o arquivo");
-            }
-
-        } else {
-            System.out.println("usuario não pode editar a linha");
+            buffW.close();
+            fileW.close();
+        } catch (IOException ex) {
+            System.out.println("erro com o arquivo");
         }
-
+        /*
+         } else {
+         System.out.println("usuario não pode editar a linha");
+         return "Bloqueado";
+         }
+         */
         return null;
     }
 
